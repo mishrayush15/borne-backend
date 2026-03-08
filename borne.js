@@ -23,8 +23,11 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'https://air-borne-n28j.vercel.app',
+    'https://air-borne.vercel.app',
   ],
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 }));
 app.use(express.json({ limit: "5mb" }));
 app.use("/uploads", express.static("uploads"));
