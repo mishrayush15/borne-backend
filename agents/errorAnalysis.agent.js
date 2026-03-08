@@ -1,4 +1,4 @@
-const { generateJSON } = require("../services/gemini.service");
+const { generateJSON } = require("../services/ai.service");
 const logger = require("../utils/logger");
 
 const SYSTEM_PROMPT = `You are an expert Error Analysis Agent. Given a raw error message or stack trace from a developer, analyze it and return a structured JSON object with the following fields:

@@ -1,4 +1,4 @@
-const { generateJSON } = require("../services/gemini.service");
+const { generateJSON } = require("../services/ai.service");
 const logger = require("../utils/logger");
 
 function computeHeuristicScore(result) {

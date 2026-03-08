@@ -1,4 +1,4 @@
-const { generateJSON } = require("../services/gemini.service");
+const { generateJSON } = require("../services/ai.service");
 const logger = require("../utils/logger");
 
 const SYSTEM_PROMPT = `You are a Solution Synthesis Agent — an expert developer who reads community discussions about an error and produces a clear, actionable debugging guide.

@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const debugSessionSchema = new mongoose.Schema(
   {
+    userId: {
+      type: String,
+      default: null,
+      index: true,
+    },
     errorInput: {
       type: String,
       required: true,

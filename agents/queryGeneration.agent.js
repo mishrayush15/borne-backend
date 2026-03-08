@@ -1,4 +1,4 @@
-const { generateJSON } = require("../services/gemini.service");
+const { generateJSON } = require("../services/ai.service");
 const logger = require("../utils/logger");
 
 const SYSTEM_PROMPT = `You are a Query Generation Agent. Given a structured error analysis object, generate 4-5 diverse search queries that a developer would use to find solutions online.

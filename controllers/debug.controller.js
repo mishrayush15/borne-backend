@@ -12,16 +12,18 @@ async function createDebugSession(req, res, next) {
     });
   }
 
+  const userId = req.user?.uid || null;
   const acceptsSSE = req.headers.accept === "text/event-stream";
 
   if (acceptsSSE) {
-    return handleSSE(req, res, errorInput, context);
+    return handleSSE(req, res, errorInput, context, userId);
   }
 
   try {
     const session = await DebugSession.create({
       errorInput,
       context: context || null,
+      userId,
       status: "processing",
     });
 
@@ -48,7 +50,7 @@ async function createDebugSession(req, res, next) {
   }
 }
 
-async function handleSSE(req, res, errorInput, context) {
+async function handleSSE(req, res, errorInput, context, userId) {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
@@ -64,6 +66,7 @@ async function handleSSE(req, res, errorInput, context) {
     session = await DebugSession.create({
       errorInput,
       context: context || null,
+      userId,
       status: "processing",
     });
 
@@ -123,4 +126,44 @@ async function getDebugSession(req, res, next) {
   }
 }
 
-module.exports = { createDebugSession, getDebugSession };
+async function getHistory(req, res, next) {
+  try {
+    const userId = req.user.uid;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const sessions = await DebugSession.find({ userId, status: "completed" })
+      .select("errorInput formattedOutput.solutionCard metadata.totalProcessingTime status createdAt")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await DebugSession.countDocuments({ userId, status: "completed" });
+
+    res.status(200).json({
+      status: "success",
+      data: sessions,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function deleteSession(req, res, next) {
+  try {
+    const session = await DebugSession.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.uid,
+    });
+    if (!session) {
+      return res.status(404).json({ status: "error", message: "Session not found" });
+    }
+    res.status(200).json({ status: "success", message: "Session deleted" });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { createDebugSession, getDebugSession, getHistory, deleteSession };

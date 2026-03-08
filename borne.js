@@ -4,15 +4,24 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
+const { initFirebase } = require("./config/firebase-admin");
 const debugRoutes = require("./routes/debug.routes");
+const userRoutes = require("./routes/user.routes");
+const projectRoutes = require("./routes/project.routes");
+const documentRoutes = require("./routes/document.routes");
+const templateRoutes = require("./routes/template.routes");
+const communityRoutes = require("./routes/community.routes");
 const errorHandler = require("./middleware/errorHandler");
 const logger = require("./utils/logger");
+
+initFirebase();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "5mb" }));
+app.use("/uploads", express.static("uploads"));
 
 app.get("/health", (req, res) => {
   const mongoState = mongoose.connection.readyState;
@@ -41,6 +50,11 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/debug", debugRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/templates", templateRoutes);
+app.use("/api/community", communityRoutes);
 
 app.use(errorHandler);
 
